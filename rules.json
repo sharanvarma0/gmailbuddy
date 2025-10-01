@@ -1,0 +1,23 @@
+{
+    "operations": [
+        {
+            "actions": [
+                {
+                   "action": "move",
+                   "value": "SPAM"
+                },
+                {
+                    "action": "mark",
+                    "value": "read"
+                }
+            ],
+            "rules": [
+                {"field_name": "From", "predicate": "contains", "value": "noreply@swiggy.in"},
+                {"field_name": "Subject", "predicate": "contains", "value": "Swiggy"},
+                {"field_name": "Date Received", "predicate": "greater than", "value": "1 days old"}
+            ],
+            "rule_predicate": "All"
+        }
+    ]
+}
+
