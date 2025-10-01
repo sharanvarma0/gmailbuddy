@@ -8,7 +8,7 @@ a small script which logs in to your gmail, fetches x number of emails and can p
 - ORM: SQLAlchemy
 
 ## File Setup
-
+```
 ├── README.md
 ├── __init__.py
 ├── credentials.json
@@ -31,6 +31,7 @@ a small script which logs in to your gmail, fetches x number of emails and can p
     │   └── gmail.py
     ├── parsing_utils.py
     └── rule_parser.py
+```
 
 download_and_store_emails.py: The initial script. Downloads Emails from Gmail and stores them in the local database
 process_emails.py: The main processing script. Uses rules (defined in rules.json) file to process emails in the database
@@ -76,15 +77,16 @@ A detailed list of supported values for each has been given below
 <b>field_name</b>: `"From", "To", "Date Sent", "Date Received", "Subject"`
 <b>predicate</b>: `for strings: "contains, does not contain", for dates: "less than, greater than"`
 <b>value</b>: `corresponding value: string or date`
+```
 
 ## Project Setup
 
 In order to initially set up this project, you would need to configure the Gmail client ID locally. This can be obtained via the Google Cloud API console. The following steps need to be performed
 
-    1. Enable the GMail API ([Google Documentation](https://developers.google.com/workspace/gmail/api/quickstart/python#enable_the_api) for this)
-    2. Create the Client ID for the desktop Application ([Google Documentation](https://developers.google.com/workspace/gmail/api/quickstart/python#authorize_credentials_for_a_desktop_application) for this)
+1. Enable the GMail API ([Google Documentation](https://developers.google.com/workspace/gmail/api/quickstart/python#enable_the_api) for this)
+2. Create the Client ID for the desktop Application ([Google Documentation](https://developers.google.com/workspace/gmail/api/quickstart/python#authorize_credentials_for_a_desktop_application) for this)
 
-We do NOT need to configure OAUTH Consent Screen unless we are going to be interacting via a web server based project via a hosted domain.
+<b>We do NOT need to configure OAUTH Consent Screen unless we are going to be interacting via a web server based project via a hosted domain.</b>
 
 Once the google credentials have been obtained, download them and save them in the project directory under the name `credentials.json`.
 
@@ -94,7 +96,7 @@ Once done, you can proceed with the following
 1. export PYTHONPATH="<root directory of the project>"
 2. pip install -r requirements.txt
 3. python3 download_and_store_emails.py
-    3a: You can configure the number of emails to be downloaded by an environment variable: `NUMBER_OF_RESULTS=10 python3 download_and_store_emails.py`
+    3a: You can configure the number of emails to be downloaded by an environment variable: `NUMBER_OF_EMAILS=10 python3 download_and_store_emails.py`
 4. Add Rules in the rules.json file
 5. python3 process_emails.py
 6. Check the database table `emails` to check the status reflected
@@ -133,3 +135,18 @@ The following is a basic overview on how this program and script works
 A simple diagram below should give enough context. The codebase is rather simple so context can be obtained in detail just by going through it.
 
 ## Future Scope and Improvements
+
+1. Better Error Handling and Exception Handling
+
+   The current codebase is barebones and uses the Exception base class everywhere. This is a problem if we at some point need to act differently on different types of exceptions. A custom set of exception classes can be used to improve this in the future.
+   
+3. Updates to DB at scale
+
+   The current approach uses an UPDATE query to update the fields in the database directly. At scale, UPDATE does a lock on the table so it could present problems. Furthermore, this direct UPDATE query is not going via an ORMs mapping engine so query optimization is a current trade off
+
+5. Use ORM to update in DB
+
+   An expansion of the point above. ORMs are much better at DB interaction due to their abstraction and certain query optimization that they do internally. They also are compliant in generating queries which are much safer from both an functional and security standpoint.
+
+7. Argparse based handling
+   Use Argparse module to pass configurable values to the scripts
