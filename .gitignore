@@ -1,2 +1,4 @@
 token.json
 credentials.json
+utils/dbutils/__pycache__/*
+utils/emailutils/__pycache__/*
