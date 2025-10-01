@@ -4,14 +4,17 @@ from email.utils import parsedate_to_datetime
 
 
 def parse_received_datetime(received_entry_raw):
-    parsed_datetime = None
+    parsed_date = None
     try:
         logger.debug(f"Input for parsing received entry: {received_entry_raw}")
         date_str = received_entry_raw
         if ';' in received_entry_raw:
             date_str = received_entry_raw.split(';')[1]
         parsed_date = parsedate_to_datetime(date_str).date()
-        logger.debug(f"Parsed DateTime: {parsed_datetime}")
+        logger.debug(f"Parsed DateTime: {parsed_date}")
+        if not parsed_date:
+            parsed_date = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z").date()
+        logger.debug(f"Parsed DateTime: {parsed_date}")
     except Exception as date_time_parsing_exc:
         logger.error(f"Exception when attempting to parse datetime in received header: {date_time_parsing_exc}")
     return parsed_date.isoformat()
