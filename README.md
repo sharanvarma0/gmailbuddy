@@ -134,6 +134,8 @@ The following is a basic overview on how this program and script works
 
 A simple diagram below should give enough context. The codebase is rather simple so context can be obtained in detail just by going through it.
 
+<img width="1533" height="897" alt="image" src="https://github.com/user-attachments/assets/28ea5ebe-a017-4914-bc14-6dada5fb86fa" />
+
 ## Future Scope and Improvements
 
 1. Better Error Handling and Exception Handling
