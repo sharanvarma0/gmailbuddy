@@ -4,6 +4,11 @@ from email.utils import parsedate_to_datetime
 
 
 def parse_received_datetime(received_entry_raw):
+
+    """This is used to parse the datetime value received from GMAIL via the API.
+    Gmail uses standard email like time but it has some additional properties which is separated
+    from the date with a ;"""
+
     parsed_date = None
     try:
         logger.debug(f"Input for parsing received entry: {received_entry_raw}")
@@ -21,9 +26,19 @@ def parse_received_datetime(received_entry_raw):
         
 
 def get_header(name, headers):
+    
+    """Gmail headers are presented as a list. There is not dictionary/map based presentation.
+    To effectively fetch headers, we need to iterate through them and see which position has
+    the value we need"""
+
     return next((h['value'] for h in headers if h['name'].lower() == name.lower()), None)
 
 def get_mailbox_and_read_status(labels):
+    
+    """Gmail presents labels as the properties of a particular email. These include read_status, mailbox, etc.
+    Again, these are presented as a list of labels and not a map. So, membership tests are required to figure out
+    which mailbox the mail is in and what the read status is"""
+
     valid_mailboxes = ['INBOX', 'IMPORTANT', 'CATEGORY_PROMOTIONS']
     valid_read_status = ['READ', 'UNREAD']
     mailbox, is_read = None, None
@@ -66,6 +81,10 @@ def parse_email(raw_email_item, headers):
 
 
 def get_list_of_emails(service_obj, number_of_results=10):
+    
+    """Gmail does not return emails in a single call. It just returns the Ids. Those ids must be then used
+    individually to obtain the detailed email object from Gmail"""
+
     messages = []
     parsed_messages = []
     try:

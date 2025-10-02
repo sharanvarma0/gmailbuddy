@@ -8,6 +8,17 @@ from dateutil.relativedelta import relativedelta
 
 class RuleParser:
 
+    """The RuleParser is a class that maps rules defined in rules.json file to a generated SQL statement
+    which can be executed via the DB connection for results.
+
+    This was an easier and faster approach instead of using the ORM directly in this case.
+
+    However, this is not recommended as it leaves the syntax and optimization of queries to the author and 
+    not the ORM. 
+
+    TODO: Convert this to use purely ORM. Remove any direct SQL based execution / parsing
+    """
+
     final_expression = ""
     config_file = "rules.json"
     raw_config_file_content = None
