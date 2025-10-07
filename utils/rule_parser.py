@@ -59,6 +59,7 @@ class RuleParser:
         "mark": "is_read"
     }
 
+
     def __init__(self, json_file_content):
         self.parsed_config_file_content = json.loads(json_file_content)
         self.operations = self.parsed_config_file_content.get("operations", [])
