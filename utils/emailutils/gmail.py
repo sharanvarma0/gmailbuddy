@@ -70,23 +70,28 @@ def update_email(service, email_id, target_labels):
     
     If the label does not exist, it will be created before pushing the change
     """
+
+    remove_labels = ["INBOX", "UNREAD"]
     
     try:
         #available_labels = get_all_valid_labels(service)
         target_label_ids = []
         logger.debug(f"Obtained email_id: {email_id}, labels for change: {target_labels}")
         labels = service.users().labels().list(userId='me').execute().get('labels', [])
-        label_id = None
+        logger.debug(f"labels for change: {target_labels}")
         for tl in target_labels:
             for l in labels:
-                if l['id'].lower() == tl.lower():
+                logger.debug(f"label: {l}, tl: {tl}")
+                if (l['id'].lower() == tl.lower()) and (tl not in remove_labels):
                     target_label_ids.append(l['id'])
                     break
-            if not target_label_ids:
+            logger.debug(f"tl: {target_label_ids}")
+            if not target_label_ids and (tl not in labels):
                 label = service.users().labels().create(userId='me', body={'name': tl, 'labelListVisibility': 'labelShow', 'messageListVisibility': 'show'}).execute()
-                target_label_ids.append(label['id'].upper())
-        print(target_label_ids)
-        service.users().messages().modify(userId='me', id=email_id, body={'removeLabelIds': ['INBOX', 'UNREAD'], 'addLabelIds': target_label_ids}).execute()
+                target_label_ids.append(tl.upper())
+        logger.debug(f"target labels: {target_labels}, labels: {labels}")
+        if target_label_ids:
+            service.users().messages().modify(userId='me', id=email_id, body={'removeLabelIds': remove_labels, 'addLabelIds': target_label_ids}).execute()
         logger.debug(f"Moved email {email_id} to {labels} and marked them")
     except Exception as mail_update_exc:
         logger.error(f"Exception when trying to update email {email_id}: {mail_update_exc}")
