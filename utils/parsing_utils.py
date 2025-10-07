@@ -55,7 +55,7 @@ def get_mailbox_and_read_status(labels):
     return mailbox, is_read
 
 
-def parse_email(raw_email_item, headers):
+def parse_email(mail_id, raw_email_item, headers):
     parsed_email = {}
     try:
         label_ids = raw_email_item.get("labelIds", [])
@@ -65,6 +65,7 @@ def parse_email(raw_email_item, headers):
             is_read = False
         else:
             is_read = True
+        parsed_email["id"] = mail_id
         parsed_email["sender"] = get_header("From", headers)
         parsed_email["receiver"] = get_header("To", headers)
         parsed_email["sent_timestamp"] = parse_received_datetime(get_header("Date", headers))
@@ -98,7 +99,7 @@ def get_list_of_emails(service_obj, number_of_results=10):
             for msg in messages:
                 m = service_obj.users().messages().get(userId='me', id=msg['id']).execute()
                 headers = m['payload']['headers']
-                parsed_email = parse_email(m, headers)
+                parsed_email = parse_email(msg['id'], m, headers)
                 parsed_messages.append(parsed_email)
         except Exception as exc:
             logger.error(f"Error when describing emails by id: {exc}")
