@@ -6,22 +6,23 @@
                     "actions": [
                         {
                            "action": "move",
-                           "value": "SPAM"
+                           "value": "IMPORTANT"
                         },
                         {
                             "action": "mark",
-                            "value": "read"
+                            "value": "unread"
                         }
                     ],
                     "rules": [
-                        {"field_name": "From", "predicate": "contains", "value": "noreply@swiggy.in"},
-                        {"field_name": "Subject", "predicate": "contains", "value": "Swiggy"},
+                        {"field_name": "From", "predicate": "contains", "value": "mailers@bseindia.in"},
+                        {"field_name": "Subject", "predicate": "contains", "value": "BSE"},
                         {"field_name": "Date Received", "predicate": "greater than", "value": "1 days old"}
                     ],
-                    "rule_predicate": "All"
+                    "rule_predicate": "Any"
                 }
             ], 
             "verification_select_statement": "SELECT * from emails_test WHERE {where_subquery}",
+            "expected_labels": ["UNREAD", "IMPORTANT"],
             "expected_result": true
         },
         {
@@ -34,15 +35,16 @@
                         }
                     ],
                     "rules": [
-                        {"field_name": "From", "predicate": "contains", "value": "noreply@swiggy.in"},
-                        {"field_name": "Subject", "predicate": "contains", "value": "Swiggy"},
-                        {"field_name": "Date Received", "predicate": "greater than", "value": "1 days old"}
+                        {"field_name": "From", "predicate": "contains", "value": "ridepure@remail.royalenfield.com"},
+                        {"field_name": "Subject", "predicate": "contains", "value": "Royal"},
+                        {"field_name": "Date Received", "predicate": "greater than", "value": "10 days old"}
                     ],
                     "rule_predicate": "All"
                 }
             ], 
             "expected_result": true,
-            "verification_select_statement": "SELECT * from emails_test WHERE {where_subquery}"
+            "verification_select_statement": "SELECT * from emails_test WHERE {where_subquery}",
+            "expected_labels": ["UNREAD"]
         },
         {
             "operations": [
@@ -62,7 +64,8 @@
                 }
             ], 
             "expected_result": true,
-            "verification_select_statement": "SELECT * from emails_test WHERE {where_subquery}"
+            "verification_select_statement": "SELECT * from emails_test WHERE {where_subquery}",
+            "expected_labels": ["UNREAD"]
         }
 
     ]
