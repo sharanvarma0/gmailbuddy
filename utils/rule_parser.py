@@ -99,6 +99,7 @@ class RuleParser:
     def _parse_operation_and_form_set_query(self, operation):
         actions = operation.get("actions", [])
         kwargs = {}
+        labels = []
         set_expressions = []
         for action in actions:
             query_action = action.get("action")
@@ -121,8 +122,27 @@ class RuleParser:
         return "SET " + ','.join(set_expressions), kwargs
 
 
-    def parse_operation(self, operation):
-        sql_query_template = 'UPDATE emails {sub_set_query} WHERE {where_query}'
+    def _parse_operation_and_get_labels(self, operation):
+        actions = operation.get("actions", [])
+        kwargs = {}
+        labels = []
+        set_expressions = []
+        for action in actions:
+            value = action.get("value", "")
+            query_action = action.get("action")
+            if query_action == "move":
+                labels.append(value)
+            if query_action == "mark":
+                if value and value.lower() == "unread":
+                    labels.append("UNREAD")
+        return labels
+
+
+    def parse_operation(self, operation, test=False):
+        if test:
+            sql_query_template = 'UPDATE emails_test {sub_set_query} WHERE {where_query}'
+        else:
+            sql_query_template = 'UPDATE emails {sub_set_query} WHERE {where_query}'
         rule_predicate = operation.get("rule_predicate", "")
         rules = operation.get("rules", [])
         set_query, set_kwargs = self._parse_operation_and_form_set_query(operation)
@@ -131,10 +151,28 @@ class RuleParser:
         kwargs = {**set_kwargs, **where_kwargs}
         logger.debug(f"Final SQL Query: {final_sql_query}")
         return final_sql_query, kwargs
+
+    def get_query_for_email_ids(self, operation, test=False):
+        if test:
+            sql_query_template = 'SELECT id FROM emails_test WHERE {where_query}'
+        else:
+            sql_query_template = 'SELECT id FROM emails WHERE {where_query}'
+        rule_predicate = operation.get("rule_predicate", "")
+        rules = operation.get("rules", [])
+        where_query, where_kwargs = self._parse_rules_and_form_where_query(rules, rule_predicate)
+        final_sql_query = sql_query_template.format(where_query=where_query)
+        kwargs = {**where_kwargs}
+        logger.debug(f"Final SQL Query: {final_sql_query}")
+        return final_sql_query, kwargs
+
     
-    def parse_operations(self):
+    def parse_operations(self, test=False):
         sql_statements = []
+        select_statements = []
         for operation in self.operations:
-            op, kwargs = self.parse_operation(operation)
+            op, kwargs = self.parse_operation(operation, test)
+            select_op, select_kwargs = self.get_query_for_email_ids(operation, test)
+            select_labels = self._parse_operation_and_get_labels(operation)
             sql_statements.append([op, kwargs])
-        return sql_statements
+            select_statements.append([select_op, select_kwargs, select_labels])
+        return sql_statements, select_statements
