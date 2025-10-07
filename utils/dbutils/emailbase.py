@@ -15,7 +15,7 @@ class EmailBase(Base):
 
     __tablename__ = "emails"
     
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(512), primary_key=True)
     subject = Column(String(512), nullable=False, default="")
     sender = Column(String(512), nullable=False, default="")
     receiver = Column(String(512), nullable=False, default="")
@@ -33,6 +33,7 @@ class EmailBase(Base):
     @staticmethod
     def from_email(email_instance):
         return EmailBase(
+            id=email_instance.get("id", ""),
             subject = email_instance.get("subject", ""),
             sender = email_instance.get("sender", ""),
             receiver = email_instance.get("receiver", ""),
@@ -82,7 +83,7 @@ class EmailBaseTest(Base):
 
     __tablename__ = 'emails_test'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(String(512), primary_key=True)
     subject = Column(String(512), nullable=False, default="")
     sender = Column(String(512), nullable=False, default="")
     receiver = Column(String(512), nullable=False, default="")
@@ -98,6 +99,7 @@ class EmailBaseTest(Base):
     @staticmethod
     def from_email(email_instance):
         return EmailBaseTest(
+            id = email_instance.get("id", ""),
             subject = email_instance.get("subject", ""),
             sender = email_instance.get("sender", ""),
             receiver = email_instance.get("receiver", ""),
