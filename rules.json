@@ -12,8 +12,8 @@
                 }
             ],
             "rules": [
-                {"field_name": "From", "predicate": "contains", "value": "billing@fastwebhost.in"},
-                {"field_name": "Subject", "predicate": "contains", "value": "Payment"},
+                {"field_name": "From", "predicate": "contains", "value": "noreply@swiggy.in"},
+                {"field_name": "Subject", "predicate": "contains", "value": "Swiggy"},
                 {"field_name": "Date Received", "predicate": "greater than", "value": "3 days old"}
             ],
             "rule_predicate": "All"
