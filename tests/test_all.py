@@ -5,6 +5,7 @@ import os
 import datetime
 from loguru import logger
 from utils.dbutils import emailbase, db_funcs
+from utils.emailutils import gmail
 from utils.rule_parser import RuleParser
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -25,13 +26,18 @@ def get_count_of_records():
     return count
 
 
-def make_connection_and_return_records(rules, rule_predicate):
-    query, query_args = make_select_statement(rules, rule_predicate)
-    query_result = None
-    with Session(db_engine) as conn:
-        result = conn.execute(text(query), {**query_args})
-        for row in result:
-            print(row)
+def get_email_labels_by_id(message_id):
+    """
+    Fetch an email by its Gmail ID and return details and labels.
+    """
+    creds = gmail.login_to_gmail()
+    service = gmail.initialize_gmail_interaction(creds)
+    
+    msg = service.users().messages().get(userId="me", id=message_id, format="raw").execute()
+    
+    # Extract labels
+    labels = msg.get("labelIds", [])
+    return labels
 
 
 def run_downloads_tests():
@@ -55,6 +61,7 @@ def run_processing_tests():
     original_rules_file = os.path.join(root_project_dir, "rules.json")
     backup_rules_file = os.path.join(root_project_dir, "rules.json.bak")
     shutil.move(original_rules_file, backup_rules_file)
+    test_result = False
 
     for test in tests:
         operations = test.get("operations", [{}])
@@ -67,18 +74,34 @@ def run_processing_tests():
 
             rp = RuleParser(json.dumps(test))
             query, query_args = rp._parse_rules_and_form_where_query(operation.get('rules', []), operation.get('rule_predicate', ""))
-
+            get_query, kwargs = rp.get_query_for_email_ids(operation, test)
+            expected_labels = operation.get("expected_labels", [])
+            email_ids = []
+            result = db_funcs.execute_raw_sql_query_and_return_result(db_engine, get_query, kwargs)
+            for row in result:
+                email_ids.append(row[0])
+            
+            for email_id in email_ids:
+                labels = get_email_labels_by_id(email_id)
+                for el in expected_labels:
+                    if el in labels:
+                        test_result = test and True
             sql_verification_statement = test.get("verification_select_statement")
             sql_verification_statement = sql_verification_statement.format(where_subquery=query)
             expected_result = test.get("expected_result")
             with Session(db_engine) as conn:
                 result = conn.execute(text(sql_verification_statement), {**query_args})
                 if not result and not expected_result:
-                    logger.error(f"Test Passed")
+                    test_result = False
                 if result and expected_result:
-                    logger.error(f"Test Passed")
+                    test_result = test and True
                 if (result and not expected_result) or (not result and expected_result):
-                    logger.error(f"Test Failed")
+                    test_result = False
+            if test:
+                logger.error("Test Passed")
+            else:
+                logger.error("Test Failed")
+
     shutil.move(backup_rules_file, original_rules_file)
 
 
