@@ -128,8 +128,10 @@ The following is a basic overview on how this program and script works
 5. It establishes a connection to the Database
 6. the rule_parser.py file under utils contains a simple RuleParser class which acts as a rule parsing engine. It reads the operations, actions and rules defined in the rules.json file and constructs an SQL statement.
 7. The final SQL statement has some parameters in it to make sure SQL injection attacks are prevented via escaping. These are substituted via a keyword argument feature that SQLAlchemy provides
-8. The query finds the records and performs the required action. This is done via an UPDATE SQL statement.
-9. The script finishes running
+8. The select query runs and finds the email ids to be updated in your gmail account.
+9. Gmail API is used to update these emails directly in GMAIL.
+10. The query finds the records and performs the required action. This is done via an UPDATE SQL statement.
+11. The script finishes running
 ```
 
 A simple diagram below should give enough context. The codebase is rather simple so context can be obtained in detail just by going through it.
