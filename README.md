@@ -136,7 +136,8 @@ The following is a basic overview on how this program and script works
 
 A simple diagram below should give enough context. The codebase is rather simple so context can be obtained in detail just by going through it.
 
-<img width="1183" height="703" alt="image" src="https://github.com/user-attachments/assets/37375fde-e64b-4e53-9fa7-523b3f417062" />
+<img width="1533" height="897" alt="image" src="https://github.com/user-attachments/assets/e6b6beb6-6c58-4819-a4ed-4eb0be6241ea" />
+
 
 
 ## Future Scope and Improvements
